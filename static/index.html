@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang=en>
+<meta charset="utf-8">
+<title>Resa 3T</title>
+<meta name=description content="Planning Management">
+<meta name=viewport content="width=device-width,initial-scale=1.0">
+<link rel=apple-touch-icon href="/static/logo.png">
+<meta name=theme-color content="#065b9d">
+<!--link rel=manifest href="manifest.json"-->
+<link rel=icon href="data:;base64,iVBORw0KGgo=">
+<link rel=stylesheet href="https://unpkg.com/chota@0.7.1/dist/chota.min.css">
+<style></style>
+
+<main>
+    <nav class="tabs content hide-pr">
+        <img src=/static/logo.svg width=42 class=brand alt=logo hidden>
+        <a is=router-link :to="{name:'PlayList'}" exact>Planning</a>
+        <a is=router-link :to="{name:'UserList'}">Users</a>
+        <a is=router-link :to="{name:'PieceList'}">Piece</a>
+        <details class="dropdown">
+            <summary class="button clear">Login</summary>
+            <form class="card row">
+                <a is=router-link :to="{name:'User', params:{id:$auth.get.name}}">My profile</a>
+                <input class="col-12" placeholder="username">
+                <input class="col-12" placeholder="password" type="password">
+                <footer class="is-right">
+                    <a class="button clear">Sign up</a>
+                    <button type="submit">Sign in</button>
+                </footer>
+            </form>
+        </details>
+    </nav>
+    <transition name=trans mode=out-in>
+        <router-view class=container>
+    </transition>
+    <Km-Toaster />
+</main>
+
+<script src="https://unpkg.com/vue@2.6.10/dist/vue.min.js"></script>
+<script src="https://unpkg.com/vue-router@3.1.3/dist/vue-router.min.js"></script>
+<script type=module>
+import {$auth, $rest, $toaster} from 'https://unpkg.com/vue-authfetch@0.0.4/index.js'
+import {PlayList, PlayForm} from '/static/Play.js'
+import {UserList, UserForm} from '/static/User.js'
+import {PieceList, PieceForm} from '/static/Piece.js'
+
+const app = new Vue({
+	el: 'main',
+	components: { KmToaster: $toaster },
+	router: new VueRouter({
+		linkActiveClass:'active',
+		mode: 'history',
+		routes: [
+            { path: '/', redirect:'/play/week'},
+			{ path:'/play/new',  name: "PlayNew",   component: PlayForm},
+			{ path:'/play/:range',     name: "Planning",  component: PlayList, props: true},
+			{ path:'/play/:id(\\d+)',  name: "PlayForm",  component: PlayForm, props: true},
+			{ path:'/piece/',    name: "PieceList", component: PieceList},
+			{ path:'/piece/new', name: "PieceNew",  component: PieceForm},
+			{ path:'/piece/:id', name: "PieceForm", component: PieceForm, props: true },
+			{ path:'/piece/:id/edit', name: "PieceEdit", component: PieceForm, props: (route) => ({ id: route.query.id, edit: true }) },
+			{ path:'/user/',     name: "UserList",  component: UserList},
+			{ path:'/user/new',  name: "UserNew",   component: UserForm, props: { edit: true }},
+			{ path:'/user/:id',  name: "UserForm",  component: UserForm, props: true },
+			{ path:'/user/:id/edit',  name: "UserEdit",  component: UserForm, props: (route) => ({ id: route.query.id, edit: true }) },
+            //{ path:'/sign/', name: "Sign", component: PageSign},
+            { path:'*', component:{template:`<b>404</b>`}}
+		]
+	}),
+})
+
+if ('serviceWorker' in navigator) {
+//	navigator.serviceWorker.register('/km/sw.js', {scope: '/km/'}).then(console.log);
+}
+//*/
+</script>
